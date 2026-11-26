@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>eli❤️</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    user-select:none;
+}
+
+html,body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:black;
+    font-family:Arial,sans-serif;
+}
+
+canvas{
+    display:block;
+    width:100vw;
+    height:100vh;
+}
+
+</style>
+</head>
+<body>
+
+<canvas id="c"></canvas>
+
+<script>
+
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+
+let W,H,CX,CY,SCALE;
+
+const DPR = Math.min(window.devicePixelRatio || 1,2);
+
+const text = "te quiero";
+
+const points = [];
+
+// cantidad perfecta
+const TOTAL = 40;
+
+function resize(){
+
+    W = window.innerWidth;
+    H = window.innerHeight;
+
+    canvas.width = W * DPR;
+    canvas.height = H * DPR;
+
+    canvas.style.width = W + "px";
+    canvas.style.height = H + "px";
+
+    ctx.setTransform(1,0,0,1,0,0);
+    ctx.scale(DPR,DPR);
+
+    CX = W / 2;
+    CY = H / 2;
+
+    SCALE = Math.min(W,H) * 0.022;
+
+    buildPoints();
+}
+
+function heart(t){
+
+    const x =
+    16 * Math.pow(Math.sin(t),3);
+
+    const y =
+    13 * Math.cos(t)
+    - 5 * Math.cos(2*t)
+    - 2 * Math.cos(3*t)
+    - Math.cos(4*t);
+
+    return{
+        x:x * SCALE,
+        y:-y * SCALE
+    };
+}
+
+function buildPoints(){
+
+    points.length = 0;
+
+    for(let i=0;i<TOTAL;i++){
+
+        const t =
+        (i / TOTAL) * Math.PI * 2;
+
+        points.push({
+            baseT:t,
+            phase:Math.random() * Math.PI * 2
+        });
+    }
+}
+
+function glowText(txt,x,y,size){
+
+    ctx.save();
+
+    ctx.font = `bold ${size}px Arial`;
+
+    ctx.textAlign = "left";
+    ctx.textBaseline = "middle";
+
+    // brillo letras
+    ctx.shadowColor = "#ff4fa3";
+    ctx.shadowBlur = 60;
+
+    ctx.fillStyle = "#fff0f6";
+
+    ctx.fillText(txt,x,y);
+
+    ctx.restore();
+}
+
+function animate(t){
+
+    ctx.clearRect(0,0,W,H);
+
+    const time = t * 0.00015;
+
+    points.forEach((p)=>{
+
+        const tt =
+        p.baseT + time;
+
+        const pos = heart(tt);
+
+        // movimiento suave
+        const wave =
+        Math.sin(time * 2 + p.phase) * 5;
+
+        const x =
+        CX + pos.x + wave * 0.6;
+
+        const y =
+        CY + pos.y;
+
+        // glow continuo siguiendo el texto
+        ctx.shadowColor = "#ff4fa3";
+        ctx.shadowBlur = 35;
+
+        ctx.fillStyle =
+        "rgba(255,80,160,0.12)";
+
+        ctx.fillRect(
+            x - 4,
+            y - 10,
+            70,
+            20
+        );
+
+        glowText(
+            text,
+            x,
+            y,
+            15
+        );
+    });
+
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize",resize);
+
+resize();
+
+requestAnimationFrame(animate);
+
+</script>
+
+</body>
+</html>  
